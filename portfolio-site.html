@@ -517,6 +517,7 @@
     </style>
 </head>
 <body>
+    <canvas id="particleCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
     <!-- Mobile Menu Toggle -->
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
@@ -553,19 +554,49 @@
             <div class="gallery-wrapper">
                 <div class="gallery-track" id="galleryTrack">
                     <div class="gallery-slide">
-                        <span>Image 1 - Add your image here</span>
+                        <img src="assets/1.jpg" alt="Project 1" loading="lazy">
                     </div>
                     <div class="gallery-slide">
-                        <span>Image 2 - Add your image here</span>
+                        <img src="assets/2.jpg" alt="Project 2" loading="lazy">
                     </div>
                     <div class="gallery-slide">
-                        <span>Image 3 - Add your image here</span>
+                        <img src="assets/3.jpg" alt="Project 3" loading="lazy">
                     </div>
                     <div class="gallery-slide">
-                        <span>Image 4 - Add your image here</span>
+                        <img src="assets/4.jpg" alt="Project 4" loading="lazy">
                     </div>
                     <div class="gallery-slide">
-                        <span>Image 5 - Add your image here</span>
+                        <img src="assets/5.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/6.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/7.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/8.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/9.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/10.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/11.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/12.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/13.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/14.jpg" alt="Project 5" loading="lazy">
+                    </div>
+                    <div class="gallery-slide">
+                        <img src="assets/15.jpg" alt="Project 5" loading="lazy">
                     </div>
                 </div>
                 <button class="gallery-arrow prev" onclick="moveGallery(-1)">‹</button>
@@ -573,6 +604,7 @@
             </div>
             <div class="gallery-dots" id="galleryDots"></div>
         </div>
+        <h3 style="text-align: center; color: var(--primary); font-size: 2rem; margin-top: 40px;">What the world has to say about me and my work</h3>
     </section>
 
     <!-- Projects Section -->
@@ -722,7 +754,7 @@
         // Auto-play gallery
         setInterval(() => {
             moveGallery(1);
-        }, 5000);
+        }, 10000);
 
         // Menu toggle for mobile
         function toggleMenu() {
@@ -783,6 +815,95 @@
             const hero = document.querySelector('.hero');
             hero.style.transform = `translateY(${scrolled * 0.5}px)`;
         });
+
+        // Particle background
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = Math.random() * 30 + 1;
+                this.color = `rgba(0, 255, 136, ${Math.random() * 0.3})`;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            update() {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < mouse.radius) {
+                    this.x -= directionX;
+                    this.y -= directionY;
+                } else {
+                    if (this.x !== this.baseX) {
+                        let dx = this.x - this.baseX;
+                        this.x -= dx/10;
+                    }
+                    if (this.y !== this.baseY) {
+                        let dy = this.y - this.baseY;
+                        this.y -= dy/10;
+                    }
+                }
+            }
+        }
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < (canvas.width * canvas.height) / 15000; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let particle of particles) {
+                particle.draw();
+                particle.update();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        init();
+        animate();
     </script>
 </body>
 </html>
